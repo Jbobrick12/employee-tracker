@@ -15,56 +15,90 @@ const db = mysql.createConnection(
   console.log("Connected Successfully!")
 );
 
+// Get all employees
 router.get("/", (req, res) => {
-  const sql = "SELECT * FROM employees";
-  db.query(sql, (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+  const query = "SELECT * FROM employees";
+
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error("Error retrieving employees:", error);
+      res.status(500).json({ error: "Error retrieving employees" });
+    } else {
+      res.json(results);
     }
-    res.json(results);
   });
 });
 
+// Get a specific employee by ID
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+  const query = "SELECT * FROM employees WHERE id = ?";
+  const values = [id];
+
+  db.query(query, values, (error, results) => {
+    if (error) {
+      console.error("Error retrieving employee:", error);
+      res.status(500).json({ error: "Error retrieving employee" });
+    } else if (results.length === 0) {
+      res.status(404).json({ error: "Employee not found" });
+    } else {
+      res.json(results[0]);
+    }
+  });
+});
+
+// Create a new employee
 router.post("/", (req, res) => {
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "firstName",
-        message: "Enter the employees first name:",
-      },
-      {
-        type: "input",
-        name: "lastName",
-        message: "Enter the employees last name:",
-      },
-      {
-        type: "input",
-        name: "department",
-        message: "Enter the employees department:",
-      },
-      {
-        type: "input",
-        name: "role",
-        message: "Enter the employees role:",
-      },
-    ])
-    .then((answers) => {
-      const { firstName, lastName } = answers;
-      const sql = "INSERT INTO employees (first_name, last_name) VALUES (?, ?)";
-      db.query(sql, [firstName, lastName], (err, result) => {
-        if (err) {
-          res.status(500).json({ error: err.message });
-          return;
-        }
-        res.json({ message: "Employee added successfully" });
-      });
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      res.status(500).send("Internal Server Error");
-    });
+  const { firstName, lastName } = req.body;
+  const query = "INSERT INTO employees (first_name, last_name) VALUES (?, ?)";
+  const values = [firstName, lastName];
+
+  db.query(query, values, (error, results) => {
+    if (error) {
+      console.error("Error creating employee:", error);
+      res.status(500).json({ error: "Error creating employee" });
+    } else {
+      res.json({ message: "Employee created successfully!" });
+    }
+  });
+});
+
+// Update an existing employee
+router.put("/:id", (req, res) => {
+  const { id } = req.params;
+  const { firstName, lastName } = req.body;
+  const query =
+    "UPDATE employees SET first_name = ?, last_name = ? WHERE id = ?";
+  const values = [firstName, lastName, id];
+
+  db.query(query, values, (error, results) => {
+    if (error) {
+      console.error("Error updating employee:", error);
+      res.status(500).json({ error: "Error updating employee" });
+    } else if (results.affectedRows === 0) {
+      res.status(404).json({ error: "Employee not found" });
+    } else {
+      res.json({ message: "Employee updated successfully!" });
+    }
+  });
+});
+
+// Delete an employee
+router.delete("/:id", (req, res) => {
+  const { id } = req.params;
+  const query = "DELETE FROM employees WHERE id = ?";
+  const values = [id];
+
+  db.query(query, values, (error, results) => {
+    if (error) {
+      console.error("Error deleting employee:", error);
+      res.status(500).json({ error: "Error deleting employee" });
+    } else if (results.affectedRows === 0) {
+      res.status(404).json({ error: "Employee not found" });
+    } else {
+      res.json({ message: "Employee deleted successfully!" });
+    }
+  });
 });
 
 module.exports = router;

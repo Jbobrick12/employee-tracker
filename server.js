@@ -2,11 +2,17 @@ require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
-const routes = require("./routes");
+const employeesRoutes = require('./routes/employees');
+const rolesRoutes = require('./routes/roles');
+const departmentsRoutes = require('./routes/departments');
 
 // Port to listen to and express
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+app.use('/employees', employeesRoutes);
+app.use('/roles', rolesRoutes);
+app.use('/departments', departmentsRoutes);
 
 // Establishing a connection
 const db = mysql.createConnection(
@@ -112,20 +118,20 @@ function employeeDelete() {
       },
     ])
     .then((answers) => {
-        const { employeeId } = answers;
-  
-        const query = `DELETE FROM employees WHERE id = ?`;
-        const values = [employeeId];
-  
-        db.query(query, values, (error, results) => {
-          if (error) {
-            console.error('Error deleting employee from the database:', error);
-          } else {
-            console.log('Employee deleted successfully!');
-          }
-        });
+      const { employeeId } = answers;
+
+      const query = `DELETE FROM employees WHERE id = ?`;
+      const values = [employeeId];
+
+      db.query(query, values, (error, results) => {
+        if (error) {
+          console.error("Error deleting employee from the database:", error);
+        } else {
+          console.log("Employee deleted successfully!");
+        }
       });
-  }
+    });
+}
 
 // Adding role
 function roleAdd() {
@@ -143,20 +149,20 @@ function roleAdd() {
       },
     ])
     .then((answers) => {
-        const { title, salary } = answers;
-  
-        const query = `INSERT INTO roles (title, salary) VALUES (?, ?)`;
-        const values = [title, salary];
-  
-        db.query(query, values, (error, results) => {
-          if (error) {
-            console.error('Error saving role to the database:', error);
-          } else {
-            console.log('Role added successfully!');
-          }
-        });
+      const { title, salary } = answers;
+
+      const query = `INSERT INTO roles (title, salary) VALUES (?, ?)`;
+      const values = [title, salary];
+
+      db.query(query, values, (error, results) => {
+        if (error) {
+          console.error("Error saving role to the database:", error);
+        } else {
+          console.log("Role added successfully!");
+        }
       });
-  }
+    });
+}
 
 // Deleting role
 function roleDelete() {
@@ -169,20 +175,20 @@ function roleDelete() {
       },
     ])
     .then((answers) => {
-        const { roleId } = answers;
-  
-        const query = `DELETE FROM roles WHERE id = ?`;
-        const values = [roleId];
-  
-        db.query(query, values, (error, results) => {
-          if (error) {
-            console.error('Error deleting role from the database:', error);
-          } else {
-            console.log('Role deleted successfully!');
-          }
-        });
+      const { roleId } = answers;
+
+      const query = `DELETE FROM roles WHERE id = ?`;
+      const values = [roleId];
+
+      db.query(query, values, (error, results) => {
+        if (error) {
+          console.error("Error deleting role from the database:", error);
+        } else {
+          console.log("Role deleted successfully!");
+        }
       });
-  }
+    });
+}
 
 // Adding department
 function departmentAdd() {
@@ -195,20 +201,20 @@ function departmentAdd() {
       },
     ])
     .then((answers) => {
-        const { name } = answers;
-  
-        const query = `INSERT INTO departments (name) VALUES (?)`;
-        const values = [name];
-  
-        db.query(query, values, (error, results) => {
-          if (error) {
-            console.error('Error saving department to the database:', error);
-          } else {
-            console.log('Department added successfully');
-          }
-        });
+      const { name } = answers;
+
+      const query = `INSERT INTO departments (name) VALUES (?)`;
+      const values = [name];
+
+      db.query(query, values, (error, results) => {
+        if (error) {
+          console.error("Error saving department to the database:", error);
+        } else {
+          console.log("Department added successfully");
+        }
       });
-  }
+    });
+}
 
 // Deleting department
 function departmentDelete() {
@@ -221,20 +227,21 @@ function departmentDelete() {
       },
     ])
     .then((answers) => {
-        const { departmentId } = answers;
-  
-        const query = `DELETE FROM departments WHERE id = ?`;
-        const values = [departmentId];
-  
-        db.query(query, values, (error, results) => {
-          if (error) {
-            console.error('Error deleting department from the database:', error);
-          } else {
-            console.log('Department deleted successfully');
-          }
-        });
+      const { departmentId } = answers;
+
+      const query = `DELETE FROM departments WHERE id = ?`;
+      const values = [departmentId];
+
+      db.query(query, values, (error, results) => {
+        if (error) {
+          console.error("Error deleting department from the database:", error);
+        } else {
+          console.log("Department deleted successfully");
+        }
       });
-  }
+    });
+}
+
 
 db.connect((error) => {
   if (error) {
