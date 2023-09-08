@@ -1,5 +1,6 @@
 -- Hopefully this gets all the employees along with their roles and departments
-SELECT employees.id, employees.first_name, employees.last_name, roles.title AS role, departments.name AS department
+SELECT employees.id AS 'Employee ID', employees.first_name AS 'First Name', employees.last_name AS 'Last Name', roles.title AS 'Job Title', departments.name AS 'Department', roles.salary AS 'Salary', CONCAT(managers.first_name, ' ', managers.last_name) AS 'Manager'
 FROM employees
 JOIN roles ON employees.role_id = roles.id
-JOIN departments ON roles.department_id = departments.id;
+JOIN departments ON roles.department_id = departments.id
+LEFT JOIN employees AS managers ON employees.manager_id = managers.id;

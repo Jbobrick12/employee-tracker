@@ -5,12 +5,16 @@ const inquirer = require("inquirer");
 
 const router = express.Router();
 
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'your_username',
-  password: 'your_password',
-  database: 'your_database'
-});
+// Establishing a connection
+const db = mysql.createConnection(
+    {
+      host: "localhost",
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    },
+    console.log("Connected Successfully!")
+  );
 
 // Get all departments
 router.get('/', (req, res) => {

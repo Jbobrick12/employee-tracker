@@ -55,8 +55,6 @@ function promptUserForAction() {
         employeeDelete();
       } else if (action === "Add Role") {
         roleAdd();
-      } else if (action === "View Roles") {
-        roleView();
       } else if (action === "Delete Role") {
         roleDelete();
       } else if (action === "Add Department") {
@@ -106,6 +104,19 @@ function employeeAdd() {
       });
     });
 }
+
+// Viewing employees
+function employeeView() {
+    const query = 'SELECT * FROM employees';
+  
+    db.query(query, (error, results) => {
+      if (error) {
+        console.error("Error retrieving employee data from the database:", error);
+      } else {
+        console.table(results);
+      }
+    });
+  }
 
 // Deleting employee
 function employeeDelete() {
@@ -216,6 +227,19 @@ function departmentAdd() {
     });
 }
 
+// Viewing departments
+function departmentView() {
+    const query = 'SELECT * FROM departments';
+  
+    db.query(query, (error, results) => {
+      if (error) {
+        console.error("Error retrieving department data from the database:", error);
+      } else {
+        console.table(results);
+      }
+    });
+  }
+
 // Deleting department
 function departmentDelete() {
   inquirer
@@ -253,5 +277,5 @@ db.connect((error) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${PORT}`);
 });
