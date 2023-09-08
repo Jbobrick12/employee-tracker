@@ -1,11 +1,8 @@
 require("dotenv").config();
 const express = require("express");
+const router = express.Router();
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
-
-// Port to listen to and express
-const app = express();
-const PORT = process.env.PORT || 3001;
 
 // Establishing a connection
 const db = mysql.createConnection(
@@ -18,7 +15,7 @@ const db = mysql.createConnection(
   console.log("Connected Successfully!")
 );
 
-app.get("/employees", (req, res) => {
+router.get("/", (req, res) => {
   const sql = "SELECT * FROM employees";
   db.query(sql, (err, results) => {
     if (err) {
@@ -29,7 +26,7 @@ app.get("/employees", (req, res) => {
   });
 });
 
-app.post("/employees", (req, res) => {
+router.post("/", (req, res) => {
   inquirer
     .prompt([
       {
@@ -69,3 +66,5 @@ app.post("/employees", (req, res) => {
       res.status(500).send("Internal Server Error");
     });
 });
+
+module.exports = router;
