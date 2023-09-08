@@ -16,7 +16,12 @@ const db = mysql.createConnection(
 
 // Get all employees
 router.get("/", (req, res) => {
-  const query = "SELECT * FROM employees";
+  const query = `
+  SELECT employees.id, employees.first_name, employees.last_name, departments.name AS department, roles.title, roles.salary
+  FROM employees
+  INNER JOIN roles ON employees.role_id = roles.id
+  INNER JOIN departments ON roles.department_id = departments.id
+`;
 
   db.query(query, (error, results) => {
     if (error) {
@@ -48,9 +53,10 @@ router.get("/:id", (req, res) => {
 
 // Create a new employee
 router.post("/", (req, res) => {
-  const { firstName, lastName } = req.body;
-  const query = "INSERT INTO employees (first_name, last_name) VALUES (?, ?)";
-  const values = [firstName, lastName];
+  const { firstName, lastName, department, role, salary } = req.body;
+  const query =
+    "INSERT INTO employees (first_name, last_name, department_id, title, salary) VALUES (?, ?, ?, ?, ?)";
+  const values = [firstName, lastName, department, role, salary];
 
   db.query(query, values, (error, results) => {
     if (error) {

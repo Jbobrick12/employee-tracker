@@ -35,6 +35,7 @@ function promptUserForAction() {
         choices: [
           "Add Employee",
           "View Employees",
+          "Update Employee",
           "Delete Employee",
           "Add Role",
           "View Roles",
@@ -51,10 +52,14 @@ function promptUserForAction() {
         employeeAdd();
       } else if (action === "View Employees") {
         employeeView();
+      } else if (action === "Update Employee") {
+        employeeUpdate();
       } else if (action === "Delete Employee") {
         employeeDelete();
       } else if (action === "Add Role") {
         roleAdd();
+      } else if (action === "View Roles") {
+        rolesView();
       } else if (action === "Delete Role") {
         roleDelete();
       } else if (action === "Add Department") {
@@ -93,14 +98,14 @@ function employeeAdd() {
       },
       {
         type: "number",
-        name: "role",
+        name: "salary",
         message: "Enter the employees salary:",
       },
     ])
     .then((answers) => {
       const { firstName, lastName, department, role, salary } = answers;
       const sql =
-        "INSERT INTO employees (first_name, last_name, department_name, title, salary) VALUES (?, ?, ?, ?, ?)";
+        "INSERT INTO employees (first_name, last_name, department_id, title, salary) VALUES (?, ?, ?, ?, ?)";
       db.query(
         sql,
         [firstName, lastName, department, role, salary],
@@ -109,6 +114,14 @@ function employeeAdd() {
             console.error("Error saving employee to the database:", error);
           } else {
             console.log("Employee added successfully!");
+            db.commit((err) => {
+              if (err) {
+                console.error("Error committing changes:", err);
+              } else {
+                console.log("Changes committed successfully!");
+              }
+            });
+            employeeView();
             promptUserForAction();
           }
         }
@@ -133,6 +146,61 @@ function employeeView() {
       promptUserForAction();
     }
   });
+}
+
+// Updating employee
+function employeeUpdate() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "employeeId",
+        message: "Enter the ID of the employee to update:",
+      },
+      {
+        type: "list",
+        name: "updateField",
+        message: "Select the field to update:",
+        choices: ["role", "salary"],
+      },
+      {
+        type: "input",
+        name: "updateValue",
+        message: "Enter the new value:",
+      },
+    ])
+    .then((answers) => {
+      const { employeeId, updateField, updateValue } = answers;
+
+      let query;
+      let values;
+
+      if (updateField === "role") {
+        query = `UPDATE employees SET role_id = ? WHERE id = ?`;
+        values = [updateValue, employeeId];
+      } else if (updateField === "salary") {
+        query = `UPDATE employees SET salary = ? WHERE id = ?`;
+        values = [updateValue, employeeId];
+      }
+
+      db.query(query, values, (error, results) => {
+        if (error) {
+          console.error("Error updating employee in the database:", error);
+        } else {
+          console.log("Employee updated successfully!");
+
+          db.commit((err) => {
+            if (err) {
+              console.error("Error committing changes:", err);
+            } else {
+              console.log("Changes committed successfully!");
+            }
+          });
+
+          promptUserForAction();
+        }
+      });
+    });
 }
 
 // Deleting employee
@@ -192,6 +260,20 @@ function roleAdd() {
         }
       });
     });
+}
+
+// Viewing roles
+function rolesView() {
+  const query = "SELECT * FROM roles";
+
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error("Error retrieving role data from the database:", error);
+    } else {
+      console.table(results);
+      promptUserForAction();
+    }
+  });
 }
 
 // Deleting role
