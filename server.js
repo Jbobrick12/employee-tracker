@@ -2,17 +2,17 @@ require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
-const employeesRoutes = require('./routes/employees');
-const rolesRoutes = require('./routes/roles');
-const departmentsRoutes = require('./routes/departments');
+const employeesRoutes = require("./routes/employees");
+const rolesRoutes = require("./routes/roles");
+const departmentsRoutes = require("./routes/departments");
 
 // Port to listen to and express
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use('/employees', employeesRoutes);
-app.use('/roles', rolesRoutes);
-app.use('/departments', departmentsRoutes);
+app.use("/employees", employeesRoutes);
+app.use("/roles", rolesRoutes);
+app.use("/departments", departmentsRoutes);
 
 // Establishing a connection
 const db = mysql.createConnection(
@@ -98,32 +98,42 @@ function employeeAdd() {
       },
     ])
     .then((answers) => {
-      const { firstName, lastName } = answers;
-      const sql = "INSERT INTO employees (first_name, last_name, department_id, title, salary) VALUES (?, ?)";
-      db.query(sql, [firstName, lastName], (error, results) => {
-        if (error) {
-          console.error("Error saving employee to the database:", error);
-        } else {
-          console.log("Employee added successfully!");
-          promptUserForAction();
+      const { firstName, lastName, department, role, salary } = answers;
+      const sql =
+        "INSERT INTO employees (first_name, last_name, department_name, title, salary) VALUES (?, ?, ?, ?, ?)";
+      db.query(
+        sql,
+        [firstName, lastName, department, role, salary],
+        (error, results) => {
+          if (error) {
+            console.error("Error saving employee to the database:", error);
+          } else {
+            console.log("Employee added successfully!");
+            promptUserForAction();
+          }
         }
-      });
+      );
     });
 }
 
 // Viewing employees
 function employeeView() {
-    const query = 'SELECT * FROM employees';
-  
-    db.query(query, (error, results) => {
-      if (error) {
-        console.error("Error retrieving employee data from the database:", error);
-      } else {
-        console.table(results);
-        promptUserForAction();
-      }
-    });
-  }
+  const query = `
+      SELECT employees.id, employees.first_name, employees.last_name, departments.name AS department, roles.title, roles.salary
+      FROM employees
+      INNER JOIN roles ON employees.role_id = roles.id
+      INNER JOIN departments ON roles.department_id = departments.id
+    `;
+
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error("Error retrieving employee data from the database:", error);
+    } else {
+      console.table(results);
+      promptUserForAction();
+    }
+  });
+}
 
 // Deleting employee
 function employeeDelete() {
@@ -240,17 +250,20 @@ function departmentAdd() {
 
 // Viewing departments
 function departmentView() {
-    const query = 'SELECT * FROM departments';
-  
-    db.query(query, (error, results) => {
-      if (error) {
-        console.error("Error retrieving department data from the database:", error);
-      } else {
-        console.table(results);
-        promptUserForAction();
-      }
-    });
-  }
+  const query = "SELECT * FROM departments";
+
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error(
+        "Error retrieving department data from the database:",
+        error
+      );
+    } else {
+      console.table(results);
+      promptUserForAction();
+    }
+  });
+}
 
 // Deleting department
 function departmentDelete() {
@@ -278,7 +291,6 @@ function departmentDelete() {
       });
     });
 }
-
 
 db.connect((error) => {
   if (error) {

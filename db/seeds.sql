@@ -5,6 +5,7 @@ VALUES ('Marketing'),
         ('Human Resources'),
         ('IT');
 
+ALTER TABLE roles MODIFY title VARCHAR(30) DEFAULT NULL;
 
 -- Inserting roles
 INSERT INTO roles (title, salary, department_id)
