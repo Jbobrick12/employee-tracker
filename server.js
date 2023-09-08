@@ -91,15 +91,21 @@ function employeeAdd() {
         name: "role",
         message: "Enter the employees role:",
       },
+      {
+        type: "number",
+        name: "role",
+        message: "Enter the employees salary:",
+      },
     ])
     .then((answers) => {
       const { firstName, lastName } = answers;
-      const sql = "INSERT INTO employees (first_name, last_name) VALUES (?, ?)";
+      const sql = "INSERT INTO employees (first_name, last_name, department_id, title, salary) VALUES (?, ?)";
       db.query(sql, [firstName, lastName], (error, results) => {
         if (error) {
           console.error("Error saving employee to the database:", error);
         } else {
           console.log("Employee added successfully!");
+          promptUserForAction();
         }
       });
     });
@@ -114,6 +120,7 @@ function employeeView() {
         console.error("Error retrieving employee data from the database:", error);
       } else {
         console.table(results);
+        promptUserForAction();
       }
     });
   }
@@ -139,6 +146,7 @@ function employeeDelete() {
           console.error("Error deleting employee from the database:", error);
         } else {
           console.log("Employee deleted successfully!");
+          promptUserForAction();
         }
       });
     });
@@ -170,6 +178,7 @@ function roleAdd() {
           console.error("Error saving role to the database:", error);
         } else {
           console.log("Role added successfully!");
+          promptUserForAction();
         }
       });
     });
@@ -196,6 +205,7 @@ function roleDelete() {
           console.error("Error deleting role from the database:", error);
         } else {
           console.log("Role deleted successfully!");
+          promptUserForAction();
         }
       });
     });
@@ -222,6 +232,7 @@ function departmentAdd() {
           console.error("Error saving department to the database:", error);
         } else {
           console.log("Department added successfully");
+          promptUserForAction();
         }
       });
     });
@@ -236,6 +247,7 @@ function departmentView() {
         console.error("Error retrieving department data from the database:", error);
       } else {
         console.table(results);
+        promptUserForAction();
       }
     });
   }
@@ -261,6 +273,7 @@ function departmentDelete() {
           console.error("Error deleting department from the database:", error);
         } else {
           console.log("Department deleted successfully");
+          promptUserForAction();
         }
       });
     });
